@@ -1,0 +1,22 @@
+{
+	"base_url": "http://18.219.101.127:3000",
+	"twillio": {
+		"twilio_accountSid": "ACc8c6836e3953c5c8560ebfd4828d9d4c",
+		"twilio_authToken": "0ca4c3ffd341a4be85b513ccbb063af2",
+		"twilio_number": "+1 731-207-7803"
+	},
+	"SendGrid":{
+        "SendGrid_host":"smtp.sendgrid.net",
+        "SendGrid_auth":{
+            "SendGrid_user":"Chrisniyo11",
+            "SendGrid_pass":"papapapa11"
+        }
+    },
+    "emailCredentials":{
+        "From":"Spoosa <md.amir1411@gmail.com>",
+        "signature":"Spoosa Team",
+        "particularSignature":"Best, \nSpoosa Dev Team ",
+        "devTeamSignature":"Best,\nSpoosa Dev Team"
+    },
+    "emailVerificationLink": "http://18.195.179.6/admin/verify"
+}

@@ -1,0 +1,21 @@
+{
+  "name": "biamond",
+  "version": "1.0.0",
+  "description": "selling diamond",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js",
+    "start": "nodemon index.js"
+  },
+  "author": "vandana",
+  "license": "ISC",
+  "dependencies": {
+    "JSON": "^1.0.0",
+    "async": "^2.6.0",
+    "chalk": "^2.3.2",
+    "glob": "^7.1.2",
+    "md5": "^2.2.1",
+    "nodemon": "^1.17.2",
+    "twilio": "^3.14.0"
+  }
+}
