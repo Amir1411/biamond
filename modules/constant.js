@@ -13,7 +13,7 @@ function define(obj, name, value) {
 
 exports.responseFlags = {};
 exports.responseMessages = {};
-
+exports.tableName = {};
 //FOR MESSAGES  
 define(exports.responseMessages, 'ALREADY_EXIST',                         'Password already exist');
 define(exports.responseMessages, 'PARAMETER_MISSING',                     'Some parameter missing.');
@@ -44,6 +44,7 @@ define(exports.responseMessages, 'SOCIAL_CREDENTIAL',                     'Pleas
 define(exports.responseMessages, 'INVALID_OTP',                           'OTP not match.'); 
 define(exports.responseMessages, 'OTP_VERIFY',                           'OTP match.'); 
 define(exports.responseMessages,  'EMAIL_VERIFY',                          ' OTP has been send to your email');
+define(exports.responseMessages,  'UPDATE_SUCCESSFULLY',                     ' Updated Successfully');
 
 //FOR FLAGS
 define(exports.responseFlags, 'ALREADY_EXIST',                       422);
@@ -70,4 +71,8 @@ define(exports.responseFlags, 'EMAIL_NOT_EXIST',                     403);
 define(exports.responseFlags, 'INVALID_OTP',                         401);
 define(exports.responseFlags, 'OTP_VERIFY',                          200);
 define(exports.responseFlags, 'EMAIL_VERIFY',                        200);
-
+define(exports.responseFlags, 'UPDATE_SUCCESSFULLY',                        200);
+// define table name 
+define(exports.tableName,'USER', 'tbl_user');
+define(exports.tableName,'DIAMOND', 'tbl_diamond_detail');
+define(exports.tableName,'WISHLIST', 'tbl_wishlist');

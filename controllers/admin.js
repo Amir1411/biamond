@@ -1,7 +1,7 @@
 var commFun = require('../modules/commonFunction');
 var responses = require('../modules/response'); 
 var adminQuery = require('../modals/admin');
-
+//login
 exports.login = function(req,res) {
     var { email,password } = req.body;
     var manValue = [email,password];
@@ -20,7 +20,7 @@ exports.login = function(req,res) {
         });
     }
 };
-
+// insert stone color
 exports.stoneColor = function(req,res){
     var { stone_color_name } = req.body;
     var manValue = [ stone_color_name ]; 
@@ -43,7 +43,7 @@ exports.stoneColor = function(req,res){
         });
     }
 };
-
+// insert stone type
 exports.stoneType = function(req,res){
     var { stone_type_name } = req.body;
     var manValue = [ stone_type_name ]; 
@@ -65,8 +65,8 @@ exports.stoneType = function(req,res){
             }
         });
     }
-}
-
+};
+// insert stone shape
 exports.stoneShape = function(req,res){
     var {stone_shape_name} =req.body;
     var manValue = [ stone_shape_name ]; 
@@ -88,4 +88,60 @@ exports.stoneShape = function(req,res){
             }    
         });
     }
+};
+// get all user details
+exports.getUserDetails = function(req,res){
+   adminQuery.userDetails(req,function(result){
+       if(result == 1 || result == 3 ) {
+        responses.sendError(res);
+       }  else if( result == 2 ) {
+        responses.invalidToken(res);
+       } else {
+        responses.success(res,result);
+       }
+   });
+};
+// remove/delete user
+exports.removeUser = function (req,res) {
+   var { access_token } = req.headers;
+   var manValue = [access_token];
+   var checkBlank = commFun.checkBlank(manValue);
+   if( checkBlank == 1 ) {
+    responses.parameterMissing(res);
+   } else {
+       adminQuery.removeUser(req,function(result){
+           if( result == 1 ) {
+            responses.sendError(res);
+           } else if(result == 2 ){
+            var response = {
+                response : {},
+                message : 'User deleted successfully'
+            }
+            res.status('200').json(response);
+           }
+       });
+   }
 }
+// insert diamond detail
+exports.addDiamond = function (req,res) {
+    var { diamond_name,clarity,carat,shape,color,grading,cut,appearance,original_price,current_price,size,stone,quantity } = req.body;
+    var manValue = [ diamond_name,clarity,carat,shape,color,grading,cut,appearance,original_price,current_price,size,stone,quantity ];
+    var checkBlank = commFun.checkBlank(manValue);
+    if( checkBlank == 1 ) {
+     responses.parameterMissing(res);
+    } else {
+        adminQuery.insertDiamond(req,function(result){
+            if( result == 1 ) {
+                responses.sendError(res);
+            } else if(result == 2 ){
+                var response = {
+                    response : {},
+                    message : 'Diamond not added'
+                }
+                res.status('200').json(response);
+            } else {
+                responses.success(res,result[0]);
+            }
+        });
+    }
+ };

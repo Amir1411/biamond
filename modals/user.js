@@ -1,70 +1,16 @@
 var connection = require('../modules/connection');
+var commFun = require('../modules/commonFunction');
 var message = require('../modules/message');
-var md5 = require("md5"); 
-// sign up
-exports.userCreate = function(req,callback) {
-    var { email,password,contact_number, device_type,device_token,latitude,longitude } = req.body;
-    var user_id = md5(new Date());
-    var access_token = md5(new Date());
-    var ency_pass = md5(password);
-    var currentTime = new Date();
-    var created_on = Math.round(currentTime.getTime() / 1000);
-    var select_query = "SELECT row_id FROM `tbl_user` WHERE `mobile`=?";
-    connection.query(select_query,[contact_number], function(selectErr,selectResult){
-        if(selectResult.length > 0){
-           callback (1);
-        } else {
-            var sql_query = "INSERT INTO `tbl_user`(user_id, access_token, email, password, mobile,device_type, device_token, latitude, longitude, created_on) VALUES (?,?,?,?,?,?,?,?,?,?) ";
-            connection.query(sql_query,[user_id, access_token, email, ency_pass, contact_number, device_type, device_token, latitude, longitude, created_on],function(err,result){
-                if(err) {
-                   callback (2);
-                } else {
-                    var user_sql = "SELECT * FROM `tbl_user` WHERE `user_id`=?";
-                    connection.query(user_sql, [user_id], function(userErr, userResult) {
-                        if (userErr) {
-                            callback(3);
-                        } else {
-                            callback(userResult);
-                        }
-                    });
-                }
-            });
-        }
-    });
-
-};
+ 
+var Promises = require('promise');
 // user login
-exports.userLogin = function(req,callback) {
-	var { contact_number,password,device_type,device_token,latitude,longitude } = req.body;
-	var ency_pass = md5(password);
-    var sql_query = "SELECT * FROM `tbl_user` WHERE `mobile`=? AND `password`=?";
-    connection.query(sql_query,[ contact_number, ency_pass],function(err,result){
-        if(err) {
-           callback(1);
-        } else {
-            if(result.length > 0) {
-                var access_token = md5(new Date());
-                var update_sql = "UPDATE `tbl_user` SET `access_token`=?, `device_type`=?, `device_token`=?, `latitude`=?, `longitude`=? WHERE `user_id`=?";
-                connection.query(update_sql, [access_token, device_type, device_token, latitude, longitude, result[0]["user_id"]], function(err, userResult){
-                    if (err) {
-                        callback(3);
-                    } else {
-                        result[0]["access_token"] = access_token;
-                        result[0]["device_type"] = device_type;
-                        result[0]["device_token"] = device_token;
-                        result[0]["latitude"] = latitude;
-                        result[0]["longitude"] = longitude;
-                        result[0]["password"] = "";
-                        callback(result);
-                    }
-                });
-            } else {
-                callback(2);						
-            }
-        }
-
+exports.userLogin = function(mobile_number,ency_pass,callback) {
+    return new Promises(function(resolve,reject){
+    var sql_query = "SELECT * FROM `tbl_user` WHERE `mobile_number`=? AND `password`=?";
+        connection.query(sql_query,[ mobile_number, ency_pass],function(err,result){
+            err ? reject(err) : resolve(result);
+        });
     });
-	
 };
 // user send otp on mobile
 exports.userSendOtp = function (req,callback) {
@@ -81,19 +27,100 @@ exports.userSendOtp = function (req,callback) {
         }
     });    
 };
-// user reset password
-exports.userResetPassword = function (req,callback) {
-    var {access_token} =req.headers;
-    var {password} = req.body;    
-    var ency_pass = md5(password);
-    var update_query = "UPDATE `tbl_user` SET `password`=? WHERE `access_token`=?";
-    connection.query(update_query,[ency_pass,access_token], function(err,result){
-        if(err){
-            callback(1); 
-        } else {
-            callback(2);
-        }
+// select wishlist 
+exports.selectWishlist = function(user_id,diamond_id,callback){
+    return new Promises(function(resolve,reject){
+        var select_query = " SELECT * FROM `tbl_wishlist` WHERE `user_id`=? AND `diamond_id`=?";
+        connection.query(select_query,[user_id,diamond_id],function(err,result){
+            err ? reject(err) : resolve(result); 
+        });
     });
 };
+//update wishlist
+exports.updateWishlist = function(quantity,price,user_id,diamond_id,callback){
+    return new Promises(function(resolve,reject){
+        var update_query = " UPDATE `tbl_wishlist` SET `quantity`=?, `price`=? WHERE `user_id`=? AND `diamond_id`=?";
+        connection.query(update_query,[quantity,price,user_id,diamond_id],function(err,result){
+            err ? reject(err) : resolve(result);
+        });
+    });
+};
+// get wishlist of user
+exports.getWishlist = function(user_id,callback){
+    return new Promises(function(resolve,reject){
+    var select_user = " SELECT * FROM `tbl_wishlist` WHERE `user_id`=? AND `is_payment`=0 ORDER BY `row_id` DESC";
+    connection.query(select_user,[user_id],function(err,result){
+       err ? reject(err) : resolve(result);            
+     });
+    });
+};
+// get user address 
+exports.addUserAddress = function(req,callback){
+    var { user_id,full_name,mobile_number,house_number,city,landmark,state,country,zip_code } = req.body;
+    var currentTime = new Date();
+    var created_on =  Math.round(currentTime.getTime() / 1000);
+    var address_id = md5(currentTime);
+    var insert_query = "INSERT INTO `tbl_user_address` SET `address_id`=?,`user_id`=?, `full_name`=?,`mobile_number`=?,`house_number`=?,`city`=?,`landmark`=?,`state`=?,`country`=?,`zip_code`=?,`created_on`=?";
+    connection.query(insert_query,[ address_id,user_id,full_name,mobile_number,house_number,city,landmark,state,country,zip_code,created_on ],function(err,result){
+        if(err)  callback(1);  else  callback(2);
+    });
+};
+// get user address
+exports.getUserAddress = function(req,callback){
+    var {access_token,user_id} = req.headers;
+   var select_user = "SELECT * FROM `tbl_user` WHERE `access_token` =?";
+    connection.query(select_user,access_token,function(err,result){
+        if(err) callback(1);
+        else {
+            if(result.length > 0) {               
+                var select_query = " SELECT * FROM `tbl_user_address` WHERE `user_id`=? ORDER BY `row_id` DESC";
+                connection.query(select_query,[ user_id ],function(err,result){
+                    if(err) callback(3); 
+                    else callback(result);
+                });
+            } else {
+                callback(2);
+            }
+        }
+    });
 
+};
+exports.selectQuery = function(table_name,value,callback) {
+    return new Promises(function(resolve,reject){
+        if ( value.length > 0 ) {
+            var sql = "SELECT * FROM " +table_name+" WHERE ?";
+            var el = [value];
+        } else {
+            var sql = "SELECT * FROM " +table_name;
+            var el = [];
+        }        
+        connection.query(sql, el, function(err, result){
+            err ? reject(err) : resolve(result);
+        });
+    });
+};
+exports.insertQuery = function(table_name,value,callback) {
+    return new Promises(function(resolve,reject){
+        var sql = " INSERT INTO "+table_name+" SET ? ";
+        connection.query(sql, [value], function(err, result){
+            err ? reject(err) : resolve(result); 
+        });
+    });
+};
+exports.updateQuery = function(table_name,value,whereCond,callback){
+    return new Promises(function(resolve,reject){
+        var sql = " UPDATE "+table_name+" SET ? WHERE ?";
+        connection.query(sql, [value,whereCond],function(err, result){
+            err ? reject(err) : resolve(result); 
+        });
+    });
+};
+exports.deleteQuery = function(table_name,whereCond,callback){
+    return new Promises(function(resolve,reject){
+        var sql = " DELETE  FROM "+table_name+" WHERE ?";
+        connection.query(sql, [whereCond],function(err, result){
+            err ? reject(err) : resolve(result); 
+        });
+    });
+};
 

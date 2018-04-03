@@ -28,7 +28,7 @@ exports.adminLogin =function(req,callback){
             }
         }
     });
-}
+};
 // insert stone color==
 exports.insertStoneColor = function(req,callback){   
     var { stone_color_name } = req.body;
@@ -57,7 +57,6 @@ exports.insertStoneColor = function(req,callback){
         }
     });
 };
-
 // insert stone type
 exports.insertStoneType = function(req,callback){
     var { stone_type_name } = req.body;    
@@ -71,13 +70,13 @@ exports.insertStoneType = function(req,callback){
             var created_on = Math.round(currentTime.getTime() / 1000);                
             var insert_sql = "INSERT INTO `tbl_admin_stone_type` (stone_type_id,stone_type_name,created_on) VALUES (?,?,?)";
             connection.query(insert_sql,[stone_type_id,stone_type_name,created_on],function(err, result){
-                if(err) { console.log(err);
+                if(err) {
                     callback(2);
                 } else {
                     var select_query = "SELECT * FROM `tbl_admin_stone_type` WHERE `stone_type_id`=?"
                     connection.query(select_query,[stone_type_id],function(selectErr,selectResult){
                         if(selectResult.length > 0) {
-                        callback(selectResult);
+                            callback(selectResult);
                         }
                     });
                 }
@@ -85,7 +84,6 @@ exports.insertStoneType = function(req,callback){
         }
     });
 };
-
 // insert stone Shape
 exports.insertStoneShape = function(req,callback){
     var { stone_shape_name } = req.body;  
@@ -113,4 +111,56 @@ exports.insertStoneShape = function(req,callback){
             });
         }
     });    
+};
+// user details 
+exports.userDetails = function(req,callback){
+   var {access_token} = req.headers;
+   var select_admin = "SELECT * FROM `tbl_admin` WHERE `access_token` =?";
+    connection.query(select_admin,access_token,function(err,result){
+        if(err) callback(1);
+        else {
+            if(result.length > 0) {               
+                var select_user = " SELECT * FROM `tbl_user` ORDER BY `row_id` DESC";
+                connection.query(select_user,function(err,result){
+                    if(err) callback(3); 
+                    else callback(result);
+                });
+            } else {
+                callback(2);
+            }
+        }
+    });
+};
+// delete user
+ exports.removeUser = function(req,callback) {
+    var {access_token} = req.headers;
+    var delete_query =" DELETE FROM `tbl_user` WHERE `access_token`=?";
+    connection.query(delete_query,[access_token],function(err,result){
+        if(err) callback(1);
+        else callback(2);
+    });
+ };
+// insert diamond details
+exports.insertDiamond = function(req,callback){
+    var { diamond_name,clarity,carat,shape,color,grading,cut,appearance,original_price,current_price,size,stone,quantity } = req.body;
+    var currentTime = new Date();
+    var access_token = md5(currentTime);
+    var diamond_id = md5(currentTime);
+    var created_on = Math.round(currentTime.getTime() / 1000); 
+    var bia_no = 12345;    
+    var insert_query = " INSERT INTO `tbl_diamond_detail` SET `access_token`=? , `diamond_id`=?, `diamond_name`=?, `clarity`=?, `carat`=?, `shape`=?, `color`=?, `grading`=?, `cut`=?, `appearance`=?, `original_price`=?, `current_price`=?, `size`=?, `stone`=?, `bia_no`=?, `quantity`=?, `created_on`=?";
+    connection.query(insert_query, [access_token,diamond_id,diamond_name,clarity,carat,shape,color,grading,cut,appearance,original_price,current_price,size,stone,bia_no,quantity,created_on], function(err,result){
+        if(err) {
+            callback(1);
+        } else {            
+            var select_query = "SELECT * FROM `tbl_diamond_detail` WHERE `access_token`= ?";
+            connection.query(select_query,[access_token], function(selectErr,selectResult){
+                if(selectResult.length > 0) {
+                    callback(selectResult);
+                }  else {
+                    callback(2);
+                }
+            }); 
+           }          
+    });
 };

@@ -12,5 +12,12 @@ exports.default = function(app){
     app.route('/admin/stoneType').post(adminPanel.stoneType);
     // admin insert stone shape
     app.route('/admin/stoneShape').post(adminPanel.stoneShape);
+    // user details
+    app.route('/admin/userDetails').post(adminPanel.getUserDetails);
+    // remove or delete user
+    app.route('/admin/removeUser').post(adminPanel.removeUser);
+    // add diamond
+    app.route('/admin/addDiamond').post(adminPanel.addDiamond);
+        
     return app;
 };
