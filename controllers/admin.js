@@ -1,147 +1,136 @@
 var commFun = require('../modules/commonFunction');
 var responses = require('../modules/response'); 
 var adminQuery = require('../modals/admin');
+var constants = require('../modules/constant'); 
+var md5 = require('md5');
 //login
 exports.login = function(req,res) {
-    var { email,password } = req.body;
-    var manValue = [email,password];
+    var { email, password } = req.body;
+    var manValue = [ email, password ];
     var checkBlank = commFun.checkBlank(manValue);
     if( checkBlank == 1 ) {
         responses.parameterMissing(res);
     } else {
-        adminQuery.adminLogin(req,function(result){
-            if( result == 1 || result == 2 ) {
-                responses.sendError(res);
-            } else if( result == 3 ) {
-                responses.invalidCredential(res);
-            } else {
-               responses.success(res, result[0]);              
-            }
-        });
-    }
-};
-// insert stone color
-exports.stoneColor = function(req,res){
-    var { stone_color_name } = req.body;
-    var manValue = [ stone_color_name ]; 
-    var checkBlank = commFun.checkBlank(manValue);
-    if(checkBlank == 1 ) {
-        responses.parameterMissing(res);
-    } else {
-        adminQuery.insertStoneColor(req,function(result){
-            if( result == 1) {
-                var response = {
-                    response: {},
-                    message: stone_color_name+' color already exist'
-                };
-                res.status('422').json(response);
-            } else if(result == 2) {
-                responses.sendError(res);
-            } else {
-                responses.success(res,result[0]);
-            }
-        });
-    }
-};
-// insert stone type
-exports.stoneType = function(req,res){
-    var { stone_type_name } = req.body;
-    var manValue = [ stone_type_name ]; 
-    var checkBlank = commFun.checkBlank(manValue);
-    if(checkBlank == 1 ) {
-        responses.parameterMissing(res);
-    } else {
-        adminQuery.insertStoneType(req,function(result){
-            if( result == 1) {
-                var response = {
-                    response: {},
-                    message: stone_type_name+' Type already exist'
-                };
-                res.status('422').json(response);
-            } else if( result == 2) {
-                responses.sendError(res);
-            } else {
-                responses.success(res,result[0]);
-            }
-        });
-    }
-};
-// insert stone shape
-exports.stoneShape = function(req,res){
-    var {stone_shape_name} =req.body;
-    var manValue = [ stone_shape_name ]; 
-    var checkBlank = commFun.checkBlank(manValue);
-    if(checkBlank == 1 ) {
-        responses.parameterMissing(res);
-    } else {
-        adminQuery.insertStoneShape(req,function(result){
-            if(result ==1 ) {
-            var response = {
-                response: {},
-                message: stone_shape_name+' Shape already exist'
-            };
-            res.status('422').json(response);
-            }  else if( result == 2 ) {
-                responses.sendError(res);
-            } else {
-                responses.success(res,result[0]);
-            }    
+        var ency_pass = md5(password);    
+        var table_name = constants.tableName.ADMIN;    
+        // ++ user exists ++//
+        adminQuery.checkEmailPassword(email,ency_pass).then(function(result){
+            if( result.length > 0 ) {
+                var access_token = md5(new Date());
+                var updateValue = { access_token:access_token };
+                var whereCond = { row_id :result[0]['row_id']};
+                //++ update user ++//
+                adminQuery.updateQuery(table_name,updateValue,whereCond).then(function(updateResult){
+                    result[0]['access_token'] = access_token;
+                    result[0]['password'] = "";
+                    responses.success(res, result[0]);
+                }).catch(function(error){
+                    console.log(error);
+                    responses.sendError(res);
+                });                
+            }  else responses.invalidCredential(res);
+        }).catch(function(error){ console.log(error);
+            responses.sendError(res);
         });
     }
 };
 // get all user details
-exports.getUserDetails = function(req,res){
-   adminQuery.userDetails(req,function(result){
-       if(result == 1 || result == 3 ) {
+exports.getUserList = function(req,res){
+    var { access_token } = req.headers;
+    var whereCond = { access_token: access_token };
+    var table_name = constants.tableName.ADMIN;
+    //++ admin user exist ++//
+    adminQuery.selectQuery(table_name,whereCond).then(function(result){
+       if( result.length > 0 ) {
+            var user_table_name = constants.tableName.USER;
+            var selectCond = {};
+            //++ get all user list ++//
+            adminQuery.selectQuery(user_table_name,selectCond).then(function(userResult){                           
+                if( userResult.lenght  > 0 ) responses.success(res,userResult);
+                else responses.dataNotFound(res);
+            }).catch(function(error){               
+                responses.sendError(res);
+            });
+       } else responses.invalidToken(res);
+   }).catch(function(error){console.log(error);
         responses.sendError(res);
-       }  else if( result == 2 ) {
-        responses.invalidToken(res);
-       } else {
-        responses.success(res,result);
-       }
    });
 };
 // remove/delete user
 exports.removeUser = function (req,res) {
    var { access_token } = req.headers;
-   var manValue = [access_token];
+   var { user_id } = req.body;
+   var manValue = [ access_token ];
    var checkBlank = commFun.checkBlank(manValue);
    if( checkBlank == 1 ) {
     responses.parameterMissing(res);
    } else {
-       adminQuery.removeUser(req,function(result){
-           if( result == 1 ) {
+        var table_name = constants.tableName.ADMIN;
+        var whereCond = {access_token:access_token};
+        adminQuery.selectQuery(table_name,whereCond).then(function(result){
+        if( result.length > 0 ) {
+            var table_name = constants.tableName.USER;
+            var whereCond = {user_id:user_id};
+            adminQuery.deleteQuery(table_name,whereCond).then(function(deleteResult){
+              if(deleteResult.affectedRows > 0) {
+                var response = {
+                    response :{},
+                    message : 'deleted successfully'
+                };
+                res.status('200').json(response);
+              } else {
+                var response = {
+                    response :{},
+                    message : 'not deleted '
+                };
+                res.status('200').json(response);
+              }
+                }).catch(function(error){
+                    responses.sendError(res);
+                });
+            } else responses.invalidToken(res);
+        }).catch(function(error){
             responses.sendError(res);
-           } else if(result == 2 ){
-            var response = {
-                response : {},
-                message : 'User deleted successfully'
-            }
-            res.status('200').json(response);
-           }
-       });
+        });
    }
-}
+};
 // insert diamond detail
 exports.addDiamond = function (req,res) {
+    var { access_token } = req.headers;
     var { diamond_name,clarity,carat,shape,color,grading,cut,appearance,original_price,current_price,size,stone,quantity } = req.body;
     var manValue = [ diamond_name,clarity,carat,shape,color,grading,cut,appearance,original_price,current_price,size,stone,quantity ];
     var checkBlank = commFun.checkBlank(manValue);
     if( checkBlank == 1 ) {
      responses.parameterMissing(res);
     } else {
-        adminQuery.insertDiamond(req,function(result){
-            if( result == 1 ) {
-                responses.sendError(res);
-            } else if(result == 2 ){
-                var response = {
-                    response : {},
-                    message : 'Diamond not added'
+        var table_name = constants.tableName.ADMIN;
+        var whereCond = {access_token:access_token};
+        adminQuery.selectQuery(table_name,whereCond).then(function(result){
+            if(result.length > 0 ){
+                var created_on = md5(new Date());
+                var table_name = constants.tableName.DIAMOND;
+                var insertField = {
+                    diamond_name:diamond_name,
+                    clarity:clarity,
+                    carat:carat,
+                    shape:shape,
+                    color:color,
+                    grading:grading,
+                    cut:cut,
+                    appearance:appearance,
+                    original_price:original_price,
+                    current_price:current_price,
+                    size:size,
+                    stone:stone,
+                    quantity:quantity,
+                    created_on:created_on
                 }
-                res.status('200').json(response);
-            } else {
-                responses.success(res,result[0]);
-            }
+                adminQuery.insertDiamond(table_name,insertField).then(function(insertResult){
+                    if( insertResult.affectedRows >0 ) responses.addedSuccessfully(res);
+                    else responses.notAdded(res);
+                });
+            } else responses.invalidToken(res);
         });
+       
     }
- };
+};

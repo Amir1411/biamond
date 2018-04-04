@@ -11,7 +11,7 @@ exports.default = function(app){
     // // user reset password 
     app.route('/user/resetPassword').post(userPanel.resetPassword);
     // all diamond detail
-    app.route('/user/getDiamondDetails').post(userPanel.getDiamondDetails);
+    app.route('/user/getDiamondList').post(userPanel.getDiamondList);
     // add into wishlist
     app.route('/user/addWishlist').post(userPanel.addWishlist);
     // get wishlist
@@ -19,6 +19,8 @@ exports.default = function(app){
     // remove wishlist
     app.route('/user/removeWishlist').post(userPanel.deleteWishlist);
     // add user address
+    app.route('/user/addUserAddress').post(userPanel.addUserAddress);
+    // get user address
     app.route('/user/getUserAddress').post(userPanel.getUserAddress);
     
     return app;

@@ -112,12 +112,40 @@ exports.invalidToken = function(res){
 	};
 	res.status(constant.responseFlags.INVALID_ACCESS_TOKEN).json(response);
 };
-exports.success = function(res) {
+exports.dataNotFound = function(res){
 	var response = {
-		response: result,
-		message: constant.responseMessages.UPDATE_SUCCESSFULLY
+		response: {},
+		message: constant.responseMessages.NO_DATA_FOUND
 	};
-	res.status(constant.responseFlags.UPDATE_SUCCESSFULLY).json(response);
+	res.status(constant.responseFlags.NO_DATA_FOUND).json(response);
+};
+exports.addedSuccessfully = function(res){
+	var response = {
+		response: {},
+		message: constant.responseMessages.ADDED_SUCCESSFULLY
+	};
+	res.status(constant.responseFlags.ADDED_SUCCESSFULLY).json(response);
+};
+exports.updatedSuccessfully = function(res){
+	var response = {
+		response: {},
+		message: constant.responseMessages.UPDATED_SUCCESSFULLY
+	};
+	res.status(constant.responseFlags.UPDATED_SUCCESSFULLY).json(response);
+};
+exports.notAdded = function(res){
+	var response = {
+		response: {},
+		message: constant.responseMessages.NOT_ADDED
+	};
+	res.status(constant.responseFlags.NOT_ADDED).json(response);
+};
+exports.notUpdated = function(res){
+	var response = {
+		response: {},
+		message: constant.responseMessages.NOT_UPDATED
+	};
+	res.status(constant.responseFlags.NOT_UPDATED).json(response);
 };
 
 
