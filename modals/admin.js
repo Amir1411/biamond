@@ -21,6 +21,7 @@ exports.selectQuery = function(table_name,value,callback) {
         connection.query(sql, el, function(err, result){
             err ? reject(err) : resolve(result);
         });
+   
     });
 };
 exports.insertQuery = function(table_name,value,callback) {
