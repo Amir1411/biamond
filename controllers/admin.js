@@ -46,7 +46,10 @@ exports.getUserList = function(req,res){
             var selectCond = {};
             //++ get all user list ++//
             adminQuery.selectQuery(user_table_name,selectCond).then(function(userResult){                           
-                if( userResult.lenght  > 0 ) responses.success(res,userResult);
+               if( userResult.length > 0 ){
+                    console.log(userResult);
+                    responses.success(res,userResult);
+                } 
                 else responses.dataNotFound(res);
             }).catch(function(error){               
                 responses.sendError(res);
