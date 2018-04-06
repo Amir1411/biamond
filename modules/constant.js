@@ -46,6 +46,8 @@ define(exports.responseMessages,  'ADDED_SUCCESSFULLY',             ' Added Succ
 define(exports.responseMessages,  'UPDATED_SUCCESSFULLY',           ' Updated Successfully');
 define(exports.responseMessages,  'NOT_ADDED',                      ' NOT Added ');
 define(exports.responseMessages,  'NOT_UPDATED',                    'NOT Updated ');
+define(exports.responseMessages,  'MOBILE_NOT_VERIFY',              'Mobile number not verified');
+define(exports.responseMessages,  'MOBILE_NOT_REGISTER',              'Mobile number not registered');
 //FOR FLAGS
 define(exports.responseFlags, 'ALREADY_EXIST',                       422);
 define(exports.responseFlags, 'PARAMETER_MISSING',                   422);
@@ -61,9 +63,9 @@ define(exports.responseFlags, 'SHOW_ERROR_MESSAGE',                  400);
 define(exports.responseFlags, 'IMAGE_FILE_MISSING',                  422);
 define(exports.responseFlags, 'ERROR_IN_EXECUTION',                  404);
 define(exports.responseFlags, 'STATUS_CHANGED_SUCCESSFULLY',         200);
-define(exports.responseFlags, 'USER_NOT_FOUND',                      204);
-define(exports.responseFlags, 'USER_NOT_CREATED',                    204);
-define(exports.responseFlags, 'NO_DATA_FOUND',                       204);
+define(exports.responseFlags, 'USER_NOT_FOUND',                      203);
+define(exports.responseFlags, 'USER_NOT_CREATED',                    203);
+define(exports.responseFlags, 'NO_DATA_FOUND',                       203);
 define(exports.responseFlags, 'USER_DELETED_SUCCESSFULLY',           200);
 define(exports.responseFlags, 'PASSWORD_CHANGED_SUCCESSFULLY',       200);
 define(exports.responseFlags, 'SOCIAL_CREDENTIAL',                   200);
@@ -73,9 +75,10 @@ define(exports.responseFlags, 'OTP_VERIFY',                          200);
 define(exports.responseFlags, 'EMAIL_VERIFY',                        200);
 define(exports.responseFlags, 'ADDED_SUCCESSFULLY',                  200);
 define(exports.responseFlags, 'UPDATED_SUCCESSFULLY',                200);
-define(exports.responseFlags, 'NOT_ADDED',                           204);
-define(exports.responseFlags, 'NOT_UPDATED',                         204);
-
+define(exports.responseFlags, 'NOT_ADDED',                           203);
+define(exports.responseFlags, 'NOT_UPDATED',                         203);
+define(exports.responseFlags, 'MOBILE_NOT_VERIFY',                   203);
+define(exports.responseFlags, 'MOBILE_NOT_REGISTER',                 203);
 // define table name 
 //++ USER ++//
 define(exports.tableName,'USER', 'tbl_user');
@@ -85,6 +88,7 @@ define(exports.tableName,'USER_ADDRESS', 'tbl_user_address');
 define(exports.tableName,'ADMIN', 'tbl_admin');
 
 //++ common table ++//
-define(exports.tableName,'DIAMOND', 'tbl_diamond_detail');
-define(exports.tableName,'WISHLIST', 'tbl_wishlist');
+define(exports.tableName,'DIAMOND', 'tbl_admin_diamond');
+define(exports.tableName,'WATCHLIST', 'tbl_watchlist');
+define(exports.tableName,'ORDER', 'tbl_order');
 

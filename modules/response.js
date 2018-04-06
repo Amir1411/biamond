@@ -147,5 +147,17 @@ exports.notUpdated = function(res){
 	};
 	res.status(constant.responseFlags.NOT_UPDATED).json(response);
 };
-
-
+exports.mobileNotVerify = function(res){ 
+	var response = {
+		response: {},
+		message: constant.responseMessages.MOBILE_NOT_VERIFY
+	};
+	res.status(constant.responseFlags.MOBILE_NOT_VERIFY).json(response);
+};
+exports.mobileNotRegister = function(res){
+	var response = {
+		response: {},
+		message: constant.responseMessages.MOBILE_NOT_REGISTER
+	};
+	res.status(constant.responseFlags.MOBILE_NOT_REGISTER).json(response);
+};
